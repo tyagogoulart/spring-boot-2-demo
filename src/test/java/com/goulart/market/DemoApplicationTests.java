@@ -1,4 +1,4 @@
-package com.goulart.market.springmarket;
+package com.goulart.market; 
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
