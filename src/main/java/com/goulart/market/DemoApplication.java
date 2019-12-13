@@ -1,5 +1,6 @@
 package com.goulart.market;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import com.goulart.market.domain.Categoria;
@@ -7,13 +8,22 @@ import com.goulart.market.domain.Cidade;
 import com.goulart.market.domain.Cliente;
 import com.goulart.market.domain.Endereco;
 import com.goulart.market.domain.Estado;
+import com.goulart.market.domain.ItemPedido;
+import com.goulart.market.domain.Pagamento;
+import com.goulart.market.domain.PagamentoComBoleto;
+import com.goulart.market.domain.PagamentoComCartao;
+import com.goulart.market.domain.Pedido;
 import com.goulart.market.domain.Produto;
+import com.goulart.market.domain.enums.EstadoPagamento;
 import com.goulart.market.domain.enums.TipoCliente;
 import com.goulart.market.repositories.CategoriaRepository;
 import com.goulart.market.repositories.CidadeRepository;
 import com.goulart.market.repositories.ClienteRepository;
 import com.goulart.market.repositories.EnderecoRepository;
 import com.goulart.market.repositories.EstadoRepository;
+import com.goulart.market.repositories.ItemPedidoRepository;
+import com.goulart.market.repositories.PagamentoRepository;
+import com.goulart.market.repositories.PedidoRepository;
 import com.goulart.market.repositories.ProdutoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +46,12 @@ public class DemoApplication implements CommandLineRunner {
 	private ClienteRepository clienteRepository;
 	@Autowired
 	private EnderecoRepository enderecoRepository;
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
+	@Autowired
+	private ItemPedidoRepository itemPedidoRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
@@ -85,6 +101,34 @@ public class DemoApplication implements CommandLineRunner {
 		clienteRepository.saveAll(Arrays.asList(cli1));
 		enderecoRepository.saveAll(Arrays.asList(e1, e2));
 
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+		Pedido ped1 = new Pedido(null, sdf.parse("30/09/2017 10:32"), cli1, e1);
+		Pedido ped2 = new Pedido(null, sdf.parse("10/10/2017 19:35"), cli1, e2);
+
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
+		ped1.setPagamento(pagto1);
+
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("20/10/2017 00:00"), null);
+		ped2.setPagamento(pagto2);
+
+		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+
+		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
+
+		ItemPedido ip1 = new ItemPedido(ped1, p1, 0.00, 1, 2000.00);
+		ItemPedido ip2 = new ItemPedido(ped1, p3, 0.00, 2, 80.00);
+		ItemPedido ip3 = new ItemPedido(ped2, p2, 100.00, 1, 800.00);
+
+		ped1.getItens().addAll(Arrays.asList(ip1, ip2));
+		ped2.getItens().addAll(Arrays.asList(ip3));
+
+		p1.getItens().addAll(Arrays.asList(ip1));
+		p2.getItens().addAll(Arrays.asList(ip3));
+		p3.getItens().addAll(Arrays.asList(ip2));
+
+		itemPedidoRepository.saveAll(Arrays.asList(ip1, ip2, ip3));
 	}
 
 }
