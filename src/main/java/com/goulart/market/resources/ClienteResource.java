@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import com.goulart.market.domain.Cliente;
 import com.goulart.market.dto.ClienteDTO;
+import com.goulart.market.dto.ClienteNewDTO;
 import com.goulart.market.services.ClienteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class ClienteResource {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Void> insert(@Valid @RequestBody ClienteDTO objDto) {
+    public ResponseEntity<Void> insert(@Valid @RequestBody ClienteNewDTO objDto) {
         Cliente obj = service.fromDTO(objDto);
         obj = service.insert(obj);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
